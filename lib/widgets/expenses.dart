@@ -38,7 +38,7 @@ class _Expenses extends State<Expenses> {
         action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
-              state.removeExpense(expense.id);
+              state.addExpense(expense);
             }),
       ));
     }
