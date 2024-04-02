@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:travel_expenses/models/expenses_state.dart';
 import 'package:travel_expenses/widgets/expense_chart.dart';
 import 'package:travel_expenses/widgets/expenses_list/expense_list.dart';
 import 'package:travel_expenses/models/expense.dart';
 import 'package:travel_expenses/widgets/new_expense.dart';
+import 'package:provider/provider.dart';
 
 class Expenses extends StatefulWidget {
   const Expenses();
@@ -14,64 +16,62 @@ class Expenses extends StatefulWidget {
 }
 
 class _Expenses extends State<Expenses> {
-  final List<Expense> _myExpenses = [
-    Expense(
-      title: 'Valentine Dinner',
-      amount: 250,
-      date: DateTime.now(),
-      category: Category.food,
-    ),
-    Expense(
-      title: 'Sky Diving',
-      amount: 500.00,
-      date: DateTime.now(),
-      category: Category.experience,
-    ),
-  ];
+//   final List<Expense> _myExpenses = [
+//     Expense(
+//       title: 'Valentine Dinner',
+//       amount: 250,
+//       date: DateTime.now(),
+//       category: Category.food,
+//     ),
+//     Expense(
+//       title: 'Sky Diving',
+//       amount: 500.00,
+//       date: DateTime.now(),
+//       category: Category.experience,
+//     ),
+//   ];
+
+  // void _addExpense(Expense expense) {
+  //   setState(() {
+  //     _myExpenses.add(expense);
+  //   });
+  // }
 
   void _openAddExpenseItemOverlay() {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
-      builder: (modalContext) => NewExpense(onAddExpense: _addExpense),
+      builder: (modalContext) => const NewExpense(),
       backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
     );
   }
 
-  void _addExpense(Expense expense) {
-    setState(() {
-      _myExpenses.add(expense);
-    });
-  }
-
-  void _removeExpense(Expense expense) {
-    final expenseIndex = _myExpenses.indexOf(expense);
-    setState(() {
-      _myExpenses.remove(expense);
-    });
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: const Text('Expense Deleted'),
-      duration: const Duration(seconds: 4),
-      action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              _myExpenses.insert(expenseIndex, expense);
-            });
-          }),
-    ));
-  }
-
   @override
   Widget build(context) {
+    var state = Provider.of<ExpensesState>(context);
+
+    void _removeExpense(Expense expense) {
+      // var expenseIndex = state.expenses.indexOf(expense);
+      state.removeExpense(expense.id);
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Expense Deleted'),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              state.removeExpense(expense.id);
+            }),
+      ));
+    }
+
     Widget mainScreenContent = const Center(
       child: Text(' No Expenses here.. Please add some'),
     );
 
-    if (_myExpenses.isNotEmpty) {
+    if (state.expenses.isNotEmpty) {
       mainScreenContent = ExpensesList(
-        allExpenses: _myExpenses,
+        allExpenses: state.expenses,
         onRemoveExpense: _removeExpense,
       );
     }
@@ -87,7 +87,7 @@ class _Expenses extends State<Expenses> {
       ),
       body: Column(
         children: [
-          Chart(expenses: _myExpenses),
+          Chart(expenses: state.expenses),
           Expanded(child: mainScreenContent)
         ],
       ),

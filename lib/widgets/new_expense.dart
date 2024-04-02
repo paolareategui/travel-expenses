@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:travel_expenses/models/expense.dart';
+import 'package:travel_expenses/models/expenses_state.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key, required this.onAddExpense});
-  final void Function(Expense expense) onAddExpense;
+  const NewExpense({super.key});
 
   @override
   State<NewExpense> createState() {
@@ -37,40 +38,44 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
-  void _submitExpense() {
-    final enteredAmount = double.tryParse(_amountController.text);
-    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
-    if (_titleController.text.trim().isEmpty ||
-        amountIsInvalid ||
-        _chosenDate == null) {
-      showDialog(
-          context: context,
-          builder: (dialogContext) => AlertDialog(
-                title: const Text('Invalid Input'),
-                content: const Text(
-                    'Please ensure you have entered a Title, Amount, Date, and Category'),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pop(dialogContext);
-                      },
-                      child: const Text('Okay'))
-                ],
-              ));
-      return;
-    }
-    widget.onAddExpense(Expense(
-      title: _titleController.text,
-      amount: enteredAmount,
-      date: _chosenDate!,
-      category: _chosenCategory,
-    ));
-    Navigator.pop(
-        context); //1. added this to close the modal after adding the expense
-  }
-
   @override
   Widget build(BuildContext context) {
+    var state = Provider.of<ExpensesState>(context);
+
+    void _submitExpense() {
+      final enteredAmount = double.tryParse(_amountController.text);
+      final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+      if (_titleController.text.trim().isEmpty ||
+          amountIsInvalid ||
+          _chosenDate == null) {
+        showDialog(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+                  title: const Text('Invalid Input'),
+                  content: const Text(
+                      'Please ensure you have entered a Title, Amount, Date, and Category'),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        child: const Text('Okay'))
+                  ],
+                ));
+        return;
+      }
+      Expense newExpense = (Expense(
+        title: _titleController.text,
+        amount: enteredAmount,
+        date: _chosenDate!,
+        category: _chosenCategory,
+      ));
+
+      state.addExpense(newExpense);
+      Navigator.pop(
+          context); //1. added this to close the modal after adding the expense
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
       child: Column(
