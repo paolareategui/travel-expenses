@@ -16,27 +16,6 @@ class Expenses extends StatefulWidget {
 }
 
 class _Expenses extends State<Expenses> {
-//   final List<Expense> _myExpenses = [
-//     Expense(
-//       title: 'Valentine Dinner',
-//       amount: 250,
-//       date: DateTime.now(),
-//       category: Category.food,
-//     ),
-//     Expense(
-//       title: 'Sky Diving',
-//       amount: 500.00,
-//       date: DateTime.now(),
-//       category: Category.experience,
-//     ),
-//   ];
-
-  // void _addExpense(Expense expense) {
-  //   setState(() {
-  //     _myExpenses.add(expense);
-  //   });
-  // }
-
   void _openAddExpenseItemOverlay() {
     showModalBottomSheet(
       isScrollControlled: true,
@@ -51,7 +30,6 @@ class _Expenses extends State<Expenses> {
     var state = Provider.of<ExpensesState>(context);
 
     void _removeExpense(Expense expense) {
-      // var expenseIndex = state.expenses.indexOf(expense);
       state.removeExpense(expense.id);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -71,7 +49,6 @@ class _Expenses extends State<Expenses> {
 
     if (state.expenses.isNotEmpty) {
       mainScreenContent = ExpensesList(
-        allExpenses: state.expenses,
         onRemoveExpense: _removeExpense,
       );
     }
