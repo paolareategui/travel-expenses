@@ -22,11 +22,23 @@ class ExpensesState extends ChangeNotifier {
   /// cart from the outside.
   UnmodifiableListView<Expense> get expenses => UnmodifiableListView(_expenses);
 
-  /// Removes all items from the cart.
+  /// Removes any given item from the cart.
   void addExpense(Expense expense) {
     _expenses.add(expense);
 
     print("new expense added");
+    print('Number of items in list ${_expenses.length.toString()}');
+    // This call tells the widgets that are listening to this model to rebuild.
+    notifyListeners();
+  }
+
+  void undoDeleteExpense(
+    int index,
+    Expense expense,
+  ) {
+    _expenses.insert(index, expense);
+
+    print("Expense deletion undid");
     print('Number of items in list ${_expenses.length.toString()}');
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
@@ -38,7 +50,39 @@ class ExpensesState extends ChangeNotifier {
 
     print('Number of items in list ${_expenses.length.toString()}');
     print('Expense with id $id removed');
+
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
+  }
+
+  //***IGNORE BELOW ***/
+
+  // UnmodifiableListView<Category> get categories =>
+  //     UnmodifiableListView(_categories);
+  // final List<Category> _categories = Category.values;
+
+//   void getCategories() {
+// for (final category in categories) {
+//       expenses.where((item) => item.category == category).toList();
+//       print('The category is $category');
+//     }
+
+//   }
+
+  double getCategoryExpense(category) {
+    double sum = 0;
+
+    List<Expense> exps;
+
+    print(category);
+
+    //var formatter = NumberFormat('#,###,000.00');
+    exps = expenses.where((item) => item.category == category).toList();
+
+    for (final exp in exps) {
+      sum += exp.amount;
+    }
+    print(sum);
+    return sum;
   }
 }

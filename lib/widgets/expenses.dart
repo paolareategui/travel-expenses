@@ -30,6 +30,7 @@ class _Expenses extends State<Expenses> {
     var state = Provider.of<ExpensesState>(context);
 
     void _removeExpense(Expense expense) {
+      final expenseIndex = state.expenses.indexOf(expense);
       state.removeExpense(expense.id);
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -38,13 +39,17 @@ class _Expenses extends State<Expenses> {
         action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
-              state.addExpense(expense);
+              //state.addExpense(expense);
+              state.undoDeleteExpense(expenseIndex, expense);
             }),
       ));
     }
 
     Widget mainScreenContent = const Center(
-      child: Text(' No Expenses here.. Please add some'),
+      child: Text(
+        ' No Expenses here.. Please add some',
+        style: TextStyle(color: Colors.black),
+      ),
     );
 
     if (state.expenses.isNotEmpty) {
@@ -55,12 +60,12 @@ class _Expenses extends State<Expenses> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Travel Expenses Tracker"),
-        actions: [
-          IconButton(
-            onPressed: _openAddExpenseItemOverlay,
-            icon: const Icon(Icons.add),
-          ),
-        ],
+      ),
+      //changed from icon button to floating action button
+      //to show "add" button at the bottom of the screen instead
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddExpenseItemOverlay,
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
